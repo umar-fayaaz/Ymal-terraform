@@ -136,31 +136,6 @@ jobs:
           echo "===== Generated main.tf ====="
           cat "${{ steps.meta.outputs.tf_workdir }}/main.tf"
 
-      - name: Commit generated Terraform output
-        if: |
-          github.actor != 'github-actions[bot]' &&
-          !contains(github.event.head_commit.message || '', 'Update generated Terraform')
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          BRANCH_NAME="${GITHUB_REF_NAME}"
-
-          git fetch origin "${BRANCH_NAME}"
-          git checkout -B "${BRANCH_NAME}" "origin/${BRANCH_NAME}"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add -- "${{ steps.meta.outputs.tf_workdir }}/"
-
-          if git diff --cached --quiet --exit-code; then
-            echo "No generated Terraform changes for ${{ steps.meta.outputs.agent }}"
-          else
-            git commit -m "Update generated Terraform for ${{ steps.meta.outputs.agent }}"
-            git push origin "HEAD:${BRANCH_NAME}"
-          fi
-
       - name: Terraform fmt
         run: terraform -chdir="${{ steps.meta.outputs.tf_workdir }}" fmt -recursive
 
@@ -219,6 +194,39 @@ jobs:
             ${{ runner.temp }}/plan-artifact/${{ steps.meta.outputs.plan_summary_file }}
           if-no-files-found: error
           retention-days: 7
+
+      - name: Remove runner-only backend file before commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f "${{ steps.meta.outputs.tf_workdir }}/backend.tf"
+          echo "===== git status after backend cleanup ====="
+          git status --short
+
+      - name: Commit generated Terraform output
+        if: |
+          github.actor != 'github-actions[bot]' &&
+          !contains(github.event.head_commit.message || '', 'Update generated Terraform')
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          BRANCH_NAME="${GITHUB_REF_NAME}"
+
+          git fetch origin "${BRANCH_NAME}"
+          git checkout -B "${BRANCH_NAME}" "origin/${BRANCH_NAME}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -- "${{ steps.meta.outputs.tf_workdir }}/main.tf"
+
+          if git diff --cached --quiet --exit-code; then
+            echo "No generated Terraform changes for ${{ steps.meta.outputs.agent }}"
+          else
+            git commit -m "Update generated Terraform for ${{ steps.meta.outputs.agent }}"
+            git push origin "HEAD:${BRANCH_NAME}"
+          fi
 
   terraform-apply:
     name: Terraform Apply
