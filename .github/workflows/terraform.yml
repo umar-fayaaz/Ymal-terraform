@@ -16,6 +16,7 @@ env:
   TF_IN_AUTOMATION: "true"
 
 jobs:
+  # Detect every changed agent YAML and run one matrix item per agent folder.
   detect-agents:
     name: Detect Changed Agent YAML Files
     runs-on: ubuntu-latest
@@ -119,6 +120,7 @@ tf_workdir = f"{agent_dir}/output"
 plan_name = f"{agent}.tfplan"
 state_key = f"{agent}/terraform.tfstate"
 artifact_name = f"tfplan-{agent}"
+plan_summary_file = f"{agent}-plan.txt"
 
 with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
     out.write(f"agent={agent}\n")
@@ -126,6 +128,7 @@ with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
     out.write(f"plan_name={plan_name}\n")
     out.write(f"state_key={state_key}\n")
     out.write(f"artifact_name={artifact_name}\n")
+    out.write(f"plan_summary_file={plan_summary_file}\n")
 PY
         env:
           AGENT_YAML: ${{ matrix.agent_yaml }}
@@ -185,10 +188,12 @@ PY
           terraform -chdir="${{ steps.meta.outputs.tf_workdir }}" plan \
             -out="${{ steps.meta.outputs.plan_name }}"
 
+      # Render the generated plan to a readable text file for reviewers.
       - name: Render plan for review
         run: |
-          terraform -chdir="${{ steps.meta.outputs.tf_workdir }}" show -no-color "${{ steps.meta.outputs.plan_name }}" > "${{ steps.meta.outputs.agent }}-plan.txt"
+          terraform -chdir="${{ steps.meta.outputs.tf_workdir }}" show -no-color "${{ steps.meta.outputs.plan_name }}" > "${{ steps.meta.outputs.plan_summary_file }}"
 
+      # Publish the plan summary to the GitHub Actions run summary.
       - name: Publish plan summary
         shell: bash
         run: |
@@ -198,7 +203,7 @@ PY
             echo "Backend key: ${{ steps.meta.outputs.state_key }}"
             echo ""
             echo "\`\`\`hcl"
-            cat "${{ steps.meta.outputs.tf_workdir }}/${{ steps.meta.outputs.agent }}-plan.txt"
+            cat "${{ steps.meta.outputs.plan_summary_file }}"
             echo "\`\`\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -207,8 +212,8 @@ PY
         with:
           name: ${{ steps.meta.outputs.artifact_name }}
           path: |
+            ${{ steps.meta.outputs.plan_summary_file }}
             ${{ steps.meta.outputs.tf_workdir }}/${{ steps.meta.outputs.plan_name }}
-            ${{ steps.meta.outputs.tf_workdir }}/${{ steps.meta.outputs.agent }}-plan.txt
           if-no-files-found: error
           retention-days: 7
 
@@ -274,12 +279,14 @@ tf_workdir = f"{agent_dir}/output"
 plan_name = f"{agent}.tfplan"
 state_key = f"{agent}/terraform.tfstate"
 artifact_name = f"tfplan-{agent}"
+plan_summary_file = f"{agent}-plan.txt"
 
 with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
     out.write(f"tf_workdir={tf_workdir}\n")
     out.write(f"plan_name={plan_name}\n")
     out.write(f"state_key={state_key}\n")
     out.write(f"artifact_name={artifact_name}\n")
+    out.write(f"plan_summary_file={plan_summary_file}\n")
 PY
         env:
           AGENT_YAML: ${{ matrix.agent_yaml }}
@@ -316,7 +323,7 @@ PY
         uses: actions/download-artifact@v4
         with:
           name: ${{ steps.meta.outputs.artifact_name }}
-          path: ${{ steps.meta.outputs.tf_workdir }}
+          path: plans
 
       - name: Azure login
         uses: azure/login@v2
@@ -335,4 +342,4 @@ PY
             -backend-config="key=${{ steps.meta.outputs.state_key }}"
 
       - name: Terraform apply from approved plan
-        run: terraform -chdir="${{ steps.meta.outputs.tf_workdir }}" apply -input=false "${{ steps.meta.outputs.plan_name }}"
+        run: terraform -chdir="${{ steps.meta.outputs.tf_workdir }}" apply -input=false "${{ github.workspace }}/plans/${{ steps.meta.outputs.plan_name }}"
