@@ -51,13 +51,13 @@ jobs:
           fi
 
           JSON_LIST=$(python - "${CHANGED[@]}" <<'PY'
-import json
-import sys
+            import json
+            import sys
 
-files = [arg.strip() for arg in sys.argv[1:] if arg.strip()]
-print(json.dumps({"include": [{"agent_yaml": f} for f in files]}))
-PY
-)
+            files = [arg.strip() for arg in sys.argv[1:] if arg.strip()]
+            print(json.dumps({"include": [{"agent_yaml": f} for f in files]}))
+          PY
+          )
 
           echo "has_changes=true" >> "$GITHUB_OUTPUT"
           echo "matrix=${JSON_LIST}" >> "$GITHUB_OUTPUT"
@@ -99,37 +99,37 @@ PY
           set -euo pipefail
 
           python - <<'PY'
-import os
-from pathlib import Path
-import yaml
+            import os
+            from pathlib import Path
+            import yaml
 
-agent_yaml = Path(os.environ["AGENT_YAML"])
-with open(agent_yaml, "r", encoding="utf-8") as f:
-    data = yaml.safe_load(f)
+            agent_yaml = Path(os.environ["AGENT_YAML"])
+            with open(agent_yaml, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
 
-if not isinstance(data, dict):
-    raise SystemExit("Agent YAML root must be a dictionary")
+            if not isinstance(data, dict):
+                raise SystemExit("Agent YAML root must be a dictionary")
 
-agent = data.get("agent")
-if not isinstance(agent, str) or not agent.strip():
-    raise SystemExit("Agent YAML must include non-empty 'agent'")
+            agent = data.get("agent")
+            if not isinstance(agent, str) or not agent.strip():
+                raise SystemExit("Agent YAML must include non-empty 'agent'")
 
-agent = agent.strip()
-agent_dir = str(agent_yaml.parent).replace('\\\\', '/')
-tf_workdir = f"{agent_dir}/output"
-plan_name = f"{agent}.tfplan"
-state_key = f"{agent}/terraform.tfstate"
-artifact_name = f"tfplan-{agent}"
-plan_summary_file = f"{agent}-plan.txt"
+            agent = agent.strip()
+            agent_dir = str(agent_yaml.parent).replace('\\\\', '/')
+            tf_workdir = f"{agent_dir}/output"
+            plan_name = f"{agent}.tfplan"
+            state_key = f"{agent}/terraform.tfstate"
+            artifact_name = f"tfplan-{agent}"
+            plan_summary_file = f"{agent}-plan.txt"
 
-with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
-    out.write(f"agent={agent}\n")
-    out.write(f"tf_workdir={tf_workdir}\n")
-    out.write(f"plan_name={plan_name}\n")
-    out.write(f"state_key={state_key}\n")
-    out.write(f"artifact_name={artifact_name}\n")
-    out.write(f"plan_summary_file={plan_summary_file}\n")
-PY
+            with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+                out.write(f"agent={agent}\n")
+                out.write(f"tf_workdir={tf_workdir}\n")
+                out.write(f"plan_name={plan_name}\n")
+                out.write(f"state_key={state_key}\n")
+                out.write(f"artifact_name={artifact_name}\n")
+                out.write(f"plan_summary_file={plan_summary_file}\n")
+          PY
         env:
           AGENT_YAML: ${{ matrix.agent_yaml }}
 
@@ -258,36 +258,36 @@ PY
           set -euo pipefail
 
           python - <<'PY'
-import os
-from pathlib import Path
-import yaml
+            import os
+            from pathlib import Path
+            import yaml
 
-agent_yaml = Path(os.environ["AGENT_YAML"])
-with open(agent_yaml, "r", encoding="utf-8") as f:
-    data = yaml.safe_load(f)
+            agent_yaml = Path(os.environ["AGENT_YAML"])
+            with open(agent_yaml, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
 
-if not isinstance(data, dict):
-    raise SystemExit("Agent YAML root must be a dictionary")
+            if not isinstance(data, dict):
+                raise SystemExit("Agent YAML root must be a dictionary")
 
-agent = data.get("agent")
-if not isinstance(agent, str) or not agent.strip():
-    raise SystemExit("Agent YAML must include non-empty 'agent'")
+            agent = data.get("agent")
+            if not isinstance(agent, str) or not agent.strip():
+                raise SystemExit("Agent YAML must include non-empty 'agent'")
 
-agent = agent.strip()
-agent_dir = str(agent_yaml.parent).replace('\\\\', '/')
-tf_workdir = f"{agent_dir}/output"
-plan_name = f"{agent}.tfplan"
-state_key = f"{agent}/terraform.tfstate"
-artifact_name = f"tfplan-{agent}"
-plan_summary_file = f"{agent}-plan.txt"
+            agent = agent.strip()
+            agent_dir = str(agent_yaml.parent).replace('\\\\', '/')
+            tf_workdir = f"{agent_dir}/output"
+            plan_name = f"{agent}.tfplan"
+            state_key = f"{agent}/terraform.tfstate"
+            artifact_name = f"tfplan-{agent}"
+            plan_summary_file = f"{agent}-plan.txt"
 
-with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
-    out.write(f"tf_workdir={tf_workdir}\n")
-    out.write(f"plan_name={plan_name}\n")
-    out.write(f"state_key={state_key}\n")
-    out.write(f"artifact_name={artifact_name}\n")
-    out.write(f"plan_summary_file={plan_summary_file}\n")
-PY
+            with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+                out.write(f"tf_workdir={tf_workdir}\n")
+                out.write(f"plan_name={plan_name}\n")
+                out.write(f"state_key={state_key}\n")
+                out.write(f"artifact_name={artifact_name}\n")
+                out.write(f"plan_summary_file={plan_summary_file}\n")
+          PY
         env:
           AGENT_YAML: ${{ matrix.agent_yaml }}
 
