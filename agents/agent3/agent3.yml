@@ -1,3 +1,5 @@
+agent: agent3
+
 service_plan:
   - name: asp-test
     location: eastus
