@@ -291,4 +291,4 @@ jobs:
             -backend-config="key=${{ steps.meta.outputs.state_key }}"
 
       - name: Terraform apply from approved plan
-        run: terraform -chdir="${{ steps.meta.outputs.tf_workdir }}" apply -input=false "./plans/${{ steps.meta.outputs.plan_name }}"
+        run: terraform -chdir="${{ steps.meta.outputs.tf_workdir }}" apply -input=false "${{ github.workspace }}/plans/${{ steps.meta.outputs.plan_name }}"
