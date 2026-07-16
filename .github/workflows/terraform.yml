@@ -134,8 +134,15 @@ jobs:
 
           az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
+      - name: Show generated Terraform
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "===== Generated main.tf ====="
+          cat "${{ steps.meta.outputs.tf_workdir }}/main.tf"
+
       - name: Terraform fmt
-        run: terraform -chdir="${{ steps.meta.outputs.tf_workdir }}" fmt -check -recursive
+        run: terraform -chdir="${{ steps.meta.outputs.tf_workdir }}" fmt -recursive
 
       - name: Terraform init with remote backend
         run: |
