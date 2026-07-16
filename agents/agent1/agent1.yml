@@ -9,10 +9,3 @@ storage_account:
     account_kind: StorageV2
     allow_nested_items_to_be_public: false
     default_to_oauth_authentication: false
-
-service_plan:
-  - name: asp-agent1
-    location: eastus
-    resource_group_name: rg-demo
-    os_type: Linux
-    sku_name: B1

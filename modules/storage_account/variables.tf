@@ -37,5 +37,7 @@ variable "public_network_access_enabled" {
 
 variable "tags" {
   type    = map(string)
-  default = {}
+  default = {
+    "project" = "demo"
+  }
 }
