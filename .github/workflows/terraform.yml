@@ -257,10 +257,10 @@ jobs:
         run: |
           set -euo pipefail
 
-          python - <<'PY'
-            import os
-            from pathlib import Path
-            import yaml
+        python - <<'PY'
+        import os
+        from pathlib import Path
+        import yaml
 
             agent_yaml = Path(os.environ["AGENT_YAML"])
             with open(agent_yaml, "r", encoding="utf-8") as f:
