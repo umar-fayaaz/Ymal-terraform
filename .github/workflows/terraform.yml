@@ -155,6 +155,8 @@ jobs:
             -backend-config="container_name=${{ secrets.TF_STATE_CONTAINER }}" \
             -backend-config="resource_group_name=${{ secrets.RESOURCE_GROUP }}" \
             -backend-config="key=${{ steps.meta.outputs.state_key }}"
+            -backend-config="use_azuread_auth=true"
+            -backend-config="use_oidc=true"
 
       - name: Terraform validate
         run: terraform -chdir="${{ steps.meta.outputs.tf_workdir }}" validate
@@ -341,6 +343,8 @@ jobs:
             -backend-config="container_name=${{ secrets.TF_STATE_CONTAINER }}" \
             -backend-config="resource_group_name=${{ secrets.RESOURCE_GROUP }}" \
             -backend-config="key=${{ steps.meta.outputs.state_key }}"
+            -backend-config="use_azuread_auth=true"
+            -backend-config="use_oidc=true"
 
       - name: Terraform apply from approved plan
         run: terraform -chdir="${{ steps.meta.outputs.tf_workdir }}" apply -input=false "${{ github.workspace }}/plans/${{ steps.meta.outputs.plan_name }}"
