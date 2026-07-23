@@ -1,7 +1,7 @@
 agent: agent1
 
 storage_account:
-  - name: stagent1001
+  - name: umartesting675
     location: eastus
     resource_group_name: rg-demo
     account_tier: Standard
@@ -9,3 +9,7 @@ storage_account:
     account_kind: StorageV2
     allow_nested_items_to_be_public: false
     default_to_oauth_authentication: false
+    tags:
+      - key: Project
+        value: dev
+
