@@ -1,0 +1,12 @@
+agent: agent5
+
+key_vault:
+  - name: "kv-umar-test-01"
+    location: "East US"
+    resource_group_name: "rg-demo"
+
+    tenant_id: "bdcfaa46-3f69-4dfd-b3f7-c582bdfbb820"
+    sku_name: "standard"
+
+    tags:
+      Project: "Exelixis"
