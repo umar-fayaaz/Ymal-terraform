@@ -1,4 +1,5 @@
 import json
+import re
 
 
 class TerraformFormatter:
@@ -35,6 +36,14 @@ class TerraformFormatter:
         # --------------------------------------------------
 
         if isinstance(value, str):
+
+            placeholder_match = re.fullmatch(
+                r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}",
+                value.strip()
+            )
+
+            if placeholder_match:
+                return f"var.{placeholder_match.group(1)}"
 
             # Terraform References
 

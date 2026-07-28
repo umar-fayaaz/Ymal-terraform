@@ -1,4 +1,5 @@
 from jinja2 import Environment, FileSystemLoader
+import re
 
 from config import Config
 from bin.generator.utils import TerraformFormatter
@@ -27,6 +28,7 @@ class TemplateEngine:
     def generate(self, yaml_data):
 
         terraform = []
+        placeholder_variables = set()
 
         for module_name, resources in yaml_data.items():
 
@@ -49,6 +51,11 @@ class TemplateEngine:
                         variable_type
                     )
 
+                    self._collect_placeholder_variables(
+                        coerced_value,
+                        placeholder_variables
+                    )
+
                     values[key] = TerraformFormatter.format(coerced_value)
 
                 terraform.append(
@@ -65,7 +72,22 @@ class TemplateEngine:
 
                 )
 
-        return "\n\n".join(terraform)
+        terraform_body = "\n\n".join(terraform)
+
+        if not placeholder_variables:
+            return terraform_body
+
+        declarations = []
+
+        for variable_name in sorted(placeholder_variables):
+
+            declarations.append(
+                f'variable "{variable_name}" {{\n'
+                f'  type = string\n'
+                f'}}'
+            )
+
+        return "\n\n".join([*declarations, terraform_body])
 
     # ---------------------------------------------------------
     # Coerce YAML value by Terraform variable type
@@ -102,3 +124,33 @@ class TemplateEngine:
             map_value[item_key] = item.get("value")
 
         return map_value
+
+    # ---------------------------------------------------------
+    # Collect ${NAME} placeholders
+    # ---------------------------------------------------------
+
+    def _collect_placeholder_variables(self, value, placeholders):
+
+        if isinstance(value, str):
+
+            match = re.fullmatch(
+                r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}",
+                value.strip()
+            )
+
+            if match:
+                placeholders.add(match.group(1))
+
+            return
+
+        if isinstance(value, list):
+
+            for item in value:
+                self._collect_placeholder_variables(item, placeholders)
+
+            return
+
+        if isinstance(value, dict):
+
+            for item in value.values():
+                self._collect_placeholder_variables(item, placeholders)

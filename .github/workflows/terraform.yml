@@ -36,6 +36,7 @@ env:
   ARM_SUBSCRIPTION_ID: ${{ github.event.inputs.azure_subscription_id || '7868ce89-bd13-41af-a6d4-560b73c8a1d9' }}
   ARM_TENANT_ID: ${{ github.event.inputs.azure_tenant_id || 'bdcfaa46-3f69-4dfd-b3f7-c582bdfbb820' }}
   STORAGE_ACCOUNT_ACCESS_KEY: ${{ secrets.STORAGE_ACCOUNT_ACCESS_KEY }}
+  TF_VAR_STORAGE_ACCOUNT_ACCESS_KEY: ${{ secrets.STORAGE_ACCOUNT_ACCESS_KEY }}
 
 jobs:
   # Detect every changed agent YAML and run one matrix item per agent folder.

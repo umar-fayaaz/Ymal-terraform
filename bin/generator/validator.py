@@ -1,4 +1,5 @@
 import yaml
+import re
 
 
 class ValidationError(Exception):
@@ -152,7 +153,55 @@ class Validator:
                             f"{module_name}[{index}] Unknown variable '{field}'."
                         )
 
+                # Placeholder validation
+
+                self._validate_placeholders(
+                    values,
+                    f"{module_name}[{index}]",
+                    errors
+                )
+
         if errors:
             raise ValidationError("\n".join(errors))
 
         return module_data
+
+    # ----------------------------------------------------
+    # Validate Placeholder Syntax
+    # ----------------------------------------------------
+
+    def _validate_placeholders(self, value, path, errors):
+
+        valid_placeholder = re.compile(
+            r"^\$\{[A-Za-z_][A-Za-z0-9_]*\}$"
+        )
+
+        if isinstance(value, str):
+
+            if "${" in value and not valid_placeholder.fullmatch(value.strip()):
+
+                errors.append(
+                    f"{path} Invalid placeholder '{value}'. Use '${{NAME}}' only (for example: '${{STORAGE_ACCOUNT_ACCESS_KEY}}')."
+                )
+
+            return
+
+        if isinstance(value, list):
+
+            for idx, item in enumerate(value):
+                self._validate_placeholders(
+                    item,
+                    f"{path}[{idx}]",
+                    errors
+                )
+
+            return
+
+        if isinstance(value, dict):
+
+            for key, item in value.items():
+                self._validate_placeholders(
+                    item,
+                    f"{path}.{key}",
+                    errors
+                )
