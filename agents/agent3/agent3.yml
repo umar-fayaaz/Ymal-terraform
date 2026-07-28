@@ -1,0 +1,15 @@
+agent: agent3
+
+log_analytics_workspace:
+  - name: "law-eva-qa"
+    location: "East US"
+    resource_group_name: "rg-demo"
+    tags:
+      Project: "Exelixis"
+
+log_analytics_workspace:
+  - name: "law-eva-uat"
+    location: "East US"
+    resource_group_name: "rg-demo"
+    tags:
+      Project: "Exelixis"
