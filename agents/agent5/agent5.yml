@@ -9,4 +9,4 @@ key_vault:
     sku_name: "standard"
 
     tags:
-      Project: "Exelixis"
+      Project: "Exelixis" 
