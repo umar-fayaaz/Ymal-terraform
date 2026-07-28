@@ -6,7 +6,7 @@ service_plan:
     resource_group_name: "rg-demo"
 
     os_type: "Linux"
-    sku_name: "B1"
+    sku_name: "S2"
 
     tags:
       Project: "Exelixis"
