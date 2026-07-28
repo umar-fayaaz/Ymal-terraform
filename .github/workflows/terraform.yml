@@ -32,9 +32,9 @@ env:
   TF_IN_AUTOMATION: "true"
   ARM_USE_OIDC: "true"
   ARM_USE_AZUREAD: "true"
-  ARM_CLIENT_ID: ${{ github.event.inputs.azure_client_id }}
-  ARM_SUBSCRIPTION_ID: ${{ github.event.inputs.azure_subscription_id }}
-  ARM_TENANT_ID: ${{ github.event.inputs.azure_tenant_id }}
+  ARM_CLIENT_ID: ${{ github.event.inputs.azure_client_id || 'da49ac14-f35b-47db-a82e-6e5d7b7f5b21' }}
+  ARM_SUBSCRIPTION_ID: ${{ github.event.inputs.azure_subscription_id || '7868ce89-bd13-41af-a6d4-560b73c8a1d9' }}
+  ARM_TENANT_ID: ${{ github.event.inputs.azure_tenant_id || 'bdcfaa46-3f69-4dfd-b3f7-c582bdfbb820' }}
 
 jobs:
   # Detect every changed agent YAML and run one matrix item per agent folder.
@@ -56,13 +56,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          BEFORE_SHA="${{ github.event.before }}"
-          CURRENT_SHA="${{ github.sha }}"
+          if [ "${{ github.event_name }}" = "push" ]; then
+            BEFORE_SHA="${{ github.event.before }}"
+            CURRENT_SHA="${{ github.sha }}"
 
-          if [ -z "${BEFORE_SHA}" ] || [ "${BEFORE_SHA}" = "0000000000000000000000000000000000000000" ]; then
-            mapfile -t CHANGED < <(git ls-files "agents/**/*.yml" "agents/**/*.yaml" | sort -u)
+            if [ -z "${BEFORE_SHA}" ] || [ "${BEFORE_SHA}" = "0000000000000000000000000000000000000000" ]; then
+              mapfile -t CHANGED < <(git ls-files "agents/**/*.yml" "agents/**/*.yaml" | sort -u)
+            else
+              mapfile -t CHANGED < <(git diff --name-only --diff-filter=AM "${BEFORE_SHA}" "${CURRENT_SHA}" -- "agents/**/*.yml" "agents/**/*.yaml" | sort -u)
+            fi
           else
-            mapfile -t CHANGED < <(git diff --name-only --diff-filter=AM "${BEFORE_SHA}" "${CURRENT_SHA}" -- "agents/**/*.yml" "agents/**/*.yaml" | sort -u)
+            mapfile -t CHANGED < <(git ls-files "agents/**/*.yml" "agents/**/*.yaml" | sort -u)
           fi
 
           if [ ${#CHANGED[@]} -eq 0 ]; then
@@ -239,9 +243,7 @@ jobs:
           git status --short
 
       - name: Commit generated Terraform output
-        if: |
-          github.actor != 'github-actions[bot]' &&
-          !contains(github.event.head_commit.message || '', 'Update generated Terraform')
+        if: github.actor != 'github-actions[bot]'
         shell: bash
         run: |
           set -euo pipefail
