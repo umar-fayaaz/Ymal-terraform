@@ -1,8 +1,7 @@
 agent: agent2
 
 log_analytics_workspace:
-  - enabled: true
-    name: "law-eva-dev"
+  - name: "law-eva-dev"
     location: "East US"
     resource_group_name: "rg-demo"
     tags:
