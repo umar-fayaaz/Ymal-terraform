@@ -1,3 +1,5 @@
+agent: agent6
+
 ai_services:
   - name: "ai-eva-dev"
     location: "East US"
