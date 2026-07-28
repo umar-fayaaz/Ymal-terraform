@@ -1,12 +1,10 @@
-module "service_plan_1" {
+module "log_analytics_workspace_1" {
 
-  source = "../../../modules/service_plan"
+  source = "../../../modules/log_analytics_workspace"
 
-  name                = "asp-eva-dev"
+  name                = "law-eva-dev"
+  location            = "East US"
   resource_group_name = "rg-demo"
-  location            = "EastUS"
-  os_type             = "Linux"
-  sku_name            = "B1"
   tags = {
     Project = "Exelixis"
   }
