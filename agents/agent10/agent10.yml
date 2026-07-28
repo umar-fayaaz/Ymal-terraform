@@ -1,3 +1,5 @@
+agent: agent10
+
 application_insights:
   - name: "appi-eva-dev"
     location: "East US"
