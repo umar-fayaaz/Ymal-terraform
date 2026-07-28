@@ -11,17 +11,14 @@ on:
         description: "Azure App Registration (service principal) client ID"
         required: true
         type: string
-        default: 'da49ac14-f35b-47db-a82e-6e5d7b7f5b21'
       azure_tenant_id:
         description: "Azure tenant ID"
         required: true
         type: string
-        default: 'bdcfaa46-3f69-4dfd-b3f7-c582bdfbb820'
       azure_subscription_id:
         description: "Azure subscription ID"
         required: true
         type: string
-        default: '7868ce89-bd13-41af-a6d4-560b73c8a1d9'
 
 permissions:
   contents: read
@@ -32,9 +29,9 @@ env:
   TF_IN_AUTOMATION: "true"
   ARM_USE_OIDC: "true"
   ARM_USE_AZUREAD: "true"
-  ARM_CLIENT_ID: ${{ github.event.inputs.azure_client_id || vars.AZURE_CLIENT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ github.event.inputs.azure_subscription_id || vars.AZURE_SUBSCRIPTION_ID }}
-  ARM_TENANT_ID: ${{ github.event.inputs.azure_tenant_id || vars.AZURE_TENANT_ID }}
+  ARM_CLIENT_ID: ${{ github.event.inputs.azure_client_id }}
+  ARM_SUBSCRIPTION_ID: ${{ github.event.inputs.azure_subscription_id }}
+  ARM_TENANT_ID: ${{ github.event.inputs.azure_tenant_id }}
 
 jobs:
   # Detect every changed agent YAML and run one matrix item per agent folder.
@@ -108,6 +105,14 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Validate Azure OIDC parameters
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${ARM_CLIENT_ID}" || (echo "ARM_CLIENT_ID is empty"; exit 1)
+          test -n "${ARM_TENANT_ID}" || (echo "ARM_TENANT_ID is empty"; exit 1)
+          test -n "${ARM_SUBSCRIPTION_ID}" || (echo "ARM_SUBSCRIPTION_ID is empty"; exit 1)
 
       - name: Azure login with OIDC federation
         uses: azure/login@v2
@@ -289,6 +294,14 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Validate Azure OIDC parameters
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${ARM_CLIENT_ID}" || (echo "ARM_CLIENT_ID is empty"; exit 1)
+          test -n "${ARM_TENANT_ID}" || (echo "ARM_TENANT_ID is empty"; exit 1)
+          test -n "${ARM_SUBSCRIPTION_ID}" || (echo "ARM_SUBSCRIPTION_ID is empty"; exit 1)
 
       - name: Azure login with OIDC federation
         uses: azure/login@v2
