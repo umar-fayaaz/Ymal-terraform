@@ -13,3 +13,4 @@ log_analytics_workspace:
     resource_group_name: "rg-demo"
     tags:
       Project: "Exelixis"
+  

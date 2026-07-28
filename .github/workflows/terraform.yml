@@ -11,14 +11,17 @@ on:
         description: "Azure App Registration (service principal) client ID"
         required: true
         type: string
+        default: 'da49ac14-f35b-47db-a82e-6e5d7b7f5b21'
       azure_tenant_id:
         description: "Azure tenant ID"
         required: true
         type: string
+        default: 'bdcfaa46-3f69-4dfd-b3f7-c582bdfbb820'
       azure_subscription_id:
         description: "Azure subscription ID"
         required: true
         type: string
+        default: '7868ce89-bd13-41af-a6d4-560b73c8a1d9'
 
 permissions:
   contents: read
