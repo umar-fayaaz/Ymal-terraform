@@ -1,11 +1,11 @@
 agent: agent2
 
-service_plan:
-  - name: asp-eva-dev
-    resource_group_name: rg-demo
-    location: EastUS
-    os_type: Linux
-    sku_name: B1
+log_analytics_workspace:
+  enabled: true
 
-    tags:
-      Project: Exelixis
+  name: "law-eva-dev"
+  location: "East US"
+  resource_group_name: "rg-demo"
+
+  tags:
+    Project: "Exelixis"
