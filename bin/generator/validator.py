@@ -17,8 +17,46 @@ class Validator:
 
     def validate(self, yaml_content: str):
 
+        class _MergeDuplicateListKeysLoader(yaml.SafeLoader):
+            pass
+
+        def _construct_mapping(loader, node, deep=False):
+
+            mapping = {}
+
+            for key_node, value_node in node.value:
+
+                key = loader.construct_object(key_node, deep=True)
+                value = loader.construct_object(value_node, deep=True)
+
+                if key in mapping:
+
+                    existing = mapping[key]
+
+                    if isinstance(existing, list) and isinstance(value, list):
+
+                        mapping[key] = [*existing, *value]
+
+                        continue
+
+                    raise ValidationError(
+                        f"Duplicate key '{key}' found in YAML. Use a single key with a list of objects."
+                    )
+
+                mapping[key] = value
+
+            return mapping
+
+        _MergeDuplicateListKeysLoader.add_constructor(
+            yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+            _construct_mapping
+        )
+
         try:
-            data = yaml.safe_load(yaml_content)
+            data = yaml.load(
+                yaml_content,
+                Loader=_MergeDuplicateListKeysLoader
+            )
 
         except Exception as ex:
             raise ValidationError(
