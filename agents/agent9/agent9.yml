@@ -1,0 +1,57 @@
+agent: agent9
+
+linux_function_app:
+  - name: "func-linux-eva-dev"
+    location: "East US"
+    resource_group_name: "rg-demo"
+
+    service_plan_id: "/subscriptions/7868ce89-bd13-41af-a6d4-560b73c8a1d9/resourceGroups/rg-demo/providers/Microsoft.Web/serverFarms/asp-eva-dev"
+    storage_account_name: "umartesting675"
+    storage_account_access_key: "${STORAGE_ACCOUNT_ACCESS_KEY}"
+    application_insights_connection_string: "InstrumentationKey=e06bc7e6-a3ef-4f85-8684-0a07b51334e3;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=61a7c441-edb0-48f6-883e-048c9b2ecefc"
+
+    https_only: true
+    builtin_logging_enabled: true
+    client_certificate_mode: "Optional"
+
+    ftps_state: "Disabled"
+    python_version: "3.11"
+
+    allowed_origins:
+      - "*"
+
+    app_settings:
+      FUNCTIONS_WORKER_RUNTIME: "python"
+      WEBSITE_RUN_FROM_PACKAGE: "1"
+
+    tags:
+      Project: "Exelixis"
+
+
+windows_function_app:
+  - name: "func-windows-eva-dev"
+    location: "East US"
+    resource_group_name: "rg-demo"
+
+    service_plan_id: "/subscriptions/7868ce89-bd13-41af-a6d4-560b73c8a1d9/resourceGroups/rg-demo/providers/Microsoft.Web/serverFarms/asp-eva-dev"
+    storage_account_name: "umartesting675"
+    storage_account_access_key: "${STORAGE_ACCOUNT_ACCESS_KEY}"
+    application_insights_connection_string: "InstrumentationKey=e06bc7e6-a3ef-4f85-8684-0a07b51334e3;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=61a7c441-edb0-48f6-883e-048c9b2ecefc"
+
+    https_only: true
+    builtin_logging_enabled: true
+    client_certificate_mode: "Optional"
+
+    ftps_state: "Disabled"
+
+    ip_restriction_default_action: "Allow"
+
+    allowed_origins:
+      - "*"
+
+    app_settings:
+      FUNCTIONS_WORKER_RUNTIME: "dotnet"
+      WEBSITE_RUN_FROM_PACKAGE: "1"
+
+    tags:
+      Project: "Exelixis"
